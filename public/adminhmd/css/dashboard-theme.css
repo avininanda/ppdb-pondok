@@ -1,0 +1,144 @@
+/* =============================================
+   Dashboard Theme Override — PPDB Nashirussunnah
+============================================= */
+
+:root {
+    /* Warna utama — override variable bawaan AdminHMD */
+    --admin-primary:      #C9A84C;
+    --admin-primary-dark: #a8872e;
+    --admin-success:      #16794d;
+    --admin-warning:      #b8860b;
+    --admin-danger:       #c0392b;
+
+    /* Sidebar — pakai navy alih-alih hitam generik */
+    --admin-sidebar:      #0a1628;
+    --admin-sidebar-soft: #132236;
+
+    /* Ring fokus input ikut warna gold, bukan biru */
+    --admin-ring: 0 0 0 4px rgba(201, 168, 76, 0.18);
+}
+
+html:not([data-theme="dark"]) {
+    --admin-sidebar:           #0a1628;
+    --admin-sidebar-soft:      #132236;
+    --admin-sidebar-border:    rgba(255, 255, 255, 0.08);
+    --admin-sidebar-text:      #d1d5db;
+    --admin-sidebar-text-strong: #ffffff;
+    --admin-sidebar-muted:     #9ca3af;
+    --admin-sidebar-icon-bg:   rgba(201, 168, 76, 0.12);
+    --admin-sidebar-icon:      #C9A84C;
+    --admin-sidebar-shadow:    18px 0 42px rgba(0, 0, 0, 0.25);
+}
+
+/* =============================================
+   Logo — hilangkan kotak gradient biru-teal
+   bawaan template supaya logo asli terlihat jelas
+============================================= */
+.brand-icon {
+    background: transparent !important;
+    padding: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.brand-icon img {
+    width: 40px !important;
+    height: 40px !important;
+    object-fit: contain;
+    filter: brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(5deg) brightness(1.2) !important;
+}
+
+/* =============================================
+   Sidebar — sesuaikan teks & hover supaya kontras
+   tetap nyaman di atas warna navy
+============================================= */
+.sidebar-nav .nav-link {
+    color: #d1d5db;
+}
+
+.sidebar-nav .nav-link.active {
+    background: rgba(201, 168, 76, 0.16);
+    color: #C9A84C;
+    font-weight: 600;
+}
+
+.sidebar-nav .nav-link:hover {
+    background: var(--admin-sidebar-soft);
+    color: #f3d98a;
+}
+
+.sidebar-user strong {
+    color: #ffffff;
+}
+
+.sidebar-user small {
+    color: #9ca3af;
+}
+
+.sidebar-user {
+    display: none !important;
+}
+
+.status-dot {
+    background: #C9A84C !important;
+}
+
+/* =============================================
+   Tombol — pakai gradasi gold supaya konsisten
+   dengan tombol di Login/Register
+============================================= */
+.btn-primary {
+    background: linear-gradient(135deg, #C9A84C, #a8872e) !important;
+    border-color: #a8872e !important;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #a8872e, #8a6d20) !important;
+    border-color: #8a6d20 !important;
+}
+
+.btn-outline-primary {
+    color: #C9A84C !important;
+    border-color: #C9A84C !important;
+    font-weight: 500 !important;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #C9A84C, #a8872e) !important;
+    color: #ffffff !important;
+    border-color: #a8872e !important;
+}
+
+/* =============================================
+   Badge status — sesuaikan supaya tidak terlalu
+   "neon", senada dengan palet keseluruhan
+============================================= */
+
+.badge.text-bg-info {
+    background-color: #1a5276 !important;
+    color: #ffffff !important;
+}
+
+
+.badge.text-bg-success {
+    background-color: #16794d !important;
+}
+
+.badge.text-bg-warning {
+    background-color: #b8860b !important;
+}
+
+.badge.text-bg-danger {
+    background-color: #c0392b !important;
+}
+/* Nomor pendaftaran — ubah biru jadi gold */
+.text-primary,
+h1.text-primary,
+h2.text-primary,
+p.text-primary,
+span.text-primary {
+    color: #C9A84C !important;
+}
