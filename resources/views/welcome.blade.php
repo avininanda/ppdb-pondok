@@ -246,7 +246,6 @@
         <div class="container py-5">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 720px;">
                 <div class="d-inline-block rounded-pill bg-light text-dark  py-1 px-3 mb-3">Alur Pendaftaran</div>
-                <h2 class="display-6 text-white mb-3">Tahapan PPDB Online Nashirussunnah</h2>
                 <p class="text-white-50 mb-0">Alur pendaftaran dalam penerimaan calon santri baru di Pondok Pesantren Nashirussunnah</p>
             </div>
            <div class="row g-3">
@@ -323,6 +322,311 @@
                 </div>
             </div>
     </section>
+
+    {{-- ================================================
+     SECTION TIMELINE PPDB
+     Dinamis dari database periode pendaftaran
+================================================ --}}
+<section id="timeline" class="py-5" style="background: #f8f9fa;">
+    <div class="container">
+
+        {{-- Heading --}}
+        <div class="text-center mb-5">
+            <button class="btn btn-sm rounded-pill px-3 py-1 mb-3"
+                style="background:rgba(201,168,76,0.15); color:#C9A84C; border:1px solid #C9A84C; font-size:13px;">
+                Jadwal PPDB
+            </button>
+            <h2 class="fw-bold" style="color:#0a1628; font-size:2rem;">
+                Timeline PPDB {{ $periode->tahun_ajaran ?? date('Y').'/'.date('Y', strtotime('+1 year')) }}
+            </h2>
+            <p class="text-muted">
+                Jadwal lengkap pelaksanaan penerimaan peserta didik baru
+            </p>
+        </div>
+
+        @if($periode)
+        @php
+            // Hitung tanggal otomatis dari periode
+            $buka         = \Carbon\Carbon::parse($periode->tanggal_buka);
+            $tutup        = \Carbon\Carbon::parse($periode->tanggal_tutup);
+            $verifikasi   = $buka->copy()->addDays(3);  // 3 hari setelah buka
+            $pengumuman   = $tutup->copy()->addDays(7); // 7 hari setelah tutup
+            $wawancara    = $tutup->copy()->addDays(14); // 14 hari setelah tutup
+            $hasilAkhir   = $tutup->copy()->addDays(21); // 21 hari setelah tutup
+            $daftarUlang  = $tutup->copy()->addDays(28); // 28 hari setelah tutup
+            $now          = \Carbon\Carbon::now();
+
+            // Tentukan status tiap tahap
+            $tahapan = [
+                [
+                    'nomor'    => '01',
+                    'judul'    => 'Pendaftaran Dibuka',
+                    'tanggal'  => $buka->format('d M Y'),
+                    'deskripsi'=> 'Calon santri dapat mendaftar secara online melalui sistem PPDB.',
+                    'icon'     => 'bi-door-open',
+                    'selesai'  => $now->gte($buka),
+                    'aktif'    => $now->gte($buka) && $now->lt($tutup),
+                ],
+                [
+                    'nomor'    => '02',
+                    'judul'    => 'Batas Akhir Pendaftaran',
+                    'tanggal'  => $tutup->format('d M Y'),
+                    'deskripsi'=> 'Pendaftaran ditutup. Pastikan seluruh berkas dan bukti pembayaran sudah diunggah.',
+                    'icon'     => 'bi-calendar-x',
+                    'selesai'  => $now->gte($tutup),
+                    'aktif'    => $now->gte($verifikasi) && $now->lt($tutup),
+                ],
+                [
+                    'nomor'    => '03',
+                    'judul'    => 'Verifikasi Berkas',
+                    'tanggal'  => $verifikasi->format('d M Y').' - '.$tutup->format('d M Y'),
+                    'deskripsi'=> 'Panitia melakukan verifikasi kelengkapan berkas dan pembayaran pendaftar.',
+                    'icon'     => 'bi-file-earmark-check',
+                    'selesai'  => $now->gte($tutup),
+                    'aktif'    => $now->gte($verifikasi) && $now->lt($tutup),
+                ],
+                [
+                    'nomor'    => '04',
+                    'judul'    => 'Tes Wawancara',
+                    'tanggal'  => $wawancara->format('d M Y'),
+                    'deskripsi'=> 'Calon santri yang lolos verifikasi berkas mengikuti tes wawancara via Google Meet.',
+                    'icon'     => 'bi-camera-video',
+                    'selesai'  => $now->gte($wawancara),
+                    'aktif'    => $now->gte($tutup) && $now->lt($hasilAkhir),
+                ],
+                [
+                    'nomor'    => '05',
+                    'judul'    => 'Pengumuman Hasil',
+                    'tanggal'  => $hasilAkhir->format('d M Y'),
+                    'deskripsi'=> 'Hasil seleksi wawancara diumumkan melalui akun masing-masing calon santri.',
+                    'icon'     => 'bi-megaphone',
+                    'selesai'  => $now->gte($hasilAkhir),
+                    'aktif'    => $now->gte($wawancara) && $now->lt($daftarUlang),
+                ],
+                [
+                    'nomor'    => '06',
+                    'judul'    => 'Daftar Ulang',
+                    'tanggal'  => $daftarUlang->format('d M Y'),
+                    'deskripsi'=> 'Calon santri yang diterima wajib melakukan daftar ulang sesuai petunjuk panitia.',
+                    'icon'     => 'bi-check-circle',
+                    'selesai'  => $now->gte($daftarUlang),
+                    'aktif'    => $now->gte($hasilAkhir),
+                ],
+            ];
+        @endphp
+
+        {{-- Timeline Desktop --}}
+        <div class="d-none d-lg-block">
+
+            {{-- Progress Bar Horizontal --}}
+            <div class="position-relative mb-5">
+                <div class="progress" style="height: 4px; background: #dee2e6;">
+                    @php
+                        $selesaiCount = collect($tahapan)->where('selesai', true)->count();
+                        $persen = ($selesaiCount / count($tahapan)) * 100;
+                    @endphp
+                    <div class="progress-bar"
+                        style="width: {{ $persen }}%; background: linear-gradient(90deg, #C9A84C, #a8872e);">
+                    </div>
+                </div>
+
+                {{-- Dots --}}
+                <div class="d-flex justify-content-between position-absolute w-100"
+                    style="top: -8px;">
+                    @foreach($tahapan as $tahap)
+                        <div class="text-center" style="width: {{ 100/count($tahapan) }}%;">
+                            <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center"
+                                style="width:20px; height:20px;
+                                background: {{ $tahap['selesai'] ? '#C9A84C' : ($tahap['aktif'] ? '#C9A84C' : '#dee2e6') }};
+                                border: 3px solid {{ $tahap['selesai'] || $tahap['aktif'] ? '#C9A84C' : '#dee2e6' }};">
+                                @if($tahap['selesai'])
+                                    <i class="bi bi-check text-white" style="font-size:10px;"></i>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Cards Timeline --}}
+            <div class="row g-3">
+                @foreach($tahapan as $index => $tahap)
+                <div class="col-lg-2">
+                    <div class="card h-100 border-0 shadow-sm"
+                        style="border-top: 3px solid {{ $tahap['selesai'] ? '#C9A84C' : ($tahap['aktif'] ? '#0a1628' : '#dee2e6') }} !important;
+                               border-radius: 12px;">
+                        <div class="card-body p-3">
+
+                            {{-- Status Badge --}}
+                            @if($tahap['aktif'] && !$tahap['selesai'])
+                                <span class="badge mb-2"
+                                    style="background:#0a1628; color:#C9A84C; font-size:10px;">
+                                    🔵 Sedang Berlangsung
+                                </span>
+                            @elseif($tahap['selesai'])
+                                <span class="badge mb-2"
+                                    style="background:rgba(201,168,76,0.15); color:#C9A84C; font-size:10px;">
+                                    ✅ Selesai
+                                </span>
+                            @else
+                                <span class="badge mb-2"
+                                    style="background:#f8f9fa; color:#adb5bd; font-size:10px;">
+                                    ⏳ Akan Datang
+                                </span>
+                            @endif
+
+                            {{-- Icon --}}
+                            <div class="mb-2">
+                                <i class="bi {{ $tahap['icon'] }}"
+                                    style="font-size:1.5rem;
+                                    color: {{ $tahap['selesai'] || $tahap['aktif'] ? '#C9A84C' : '#adb5bd' }};"></i>
+                            </div>
+
+                            {{-- Nomor --}}
+                            <span class="fw-bold d-block mb-1"
+                                style="color:#C9A84C; font-size:11px;">
+                                TAHAP {{ $tahap['nomor'] }}
+                            </span>
+
+                            {{-- Judul --}}
+                            <h6 class="fw-bold mb-1" style="color:#0a1628; font-size:13px;">
+                                {{ $tahap['judul'] }}
+                            </h6>
+
+                            {{-- Tanggal --}}
+                            <p class="mb-2"
+                                style="color:#C9A84C; font-size:11px; font-weight:600;">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ $tahap['tanggal'] }}
+                            </p>
+
+                            {{-- Deskripsi --}}
+                            <p class="mb-0 text-muted" style="font-size:11px; line-height:1.5;">
+                                {{ $tahap['deskripsi'] }}
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+        </div>
+
+        {{-- Timeline Mobile (Vertikal) --}}
+        <div class="d-lg-none">
+            <div class="position-relative">
+                {{-- Garis vertikal --}}
+                <div class="position-absolute"
+                    style="left: 20px; top: 0; bottom: 0; width: 2px;
+                           background: linear-gradient(180deg, #C9A84C, #dee2e6);">
+                </div>
+
+                @foreach($tahapan as $tahap)
+                <div class="d-flex gap-3 mb-4 position-relative">
+
+                    {{-- Dot --}}
+                    <div class="rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center"
+                        style="width:40px; height:40px; z-index:1;
+                        background: {{ $tahap['selesai'] ? 'linear-gradient(135deg, #C9A84C, #a8872e)' : ($tahap['aktif'] ? '#0a1628' : '#f8f9fa') }};
+                        border: 2px solid {{ $tahap['selesai'] || $tahap['aktif'] ? '#C9A84C' : '#dee2e6' }};">
+                        <i class="bi {{ $tahap['icon'] }}"
+                            style="font-size:16px;
+                            color: {{ $tahap['selesai'] ? '#fff' : ($tahap['aktif'] ? '#C9A84C' : '#adb5bd') }};"></i>
+                    </div>
+
+                    {{-- Konten --}}
+                    <div class="card border-0 shadow-sm flex-grow-1"
+                        style="border-radius:12px;
+                        border-left: 3px solid {{ $tahap['selesai'] ? '#C9A84C' : ($tahap['aktif'] ? '#0a1628' : '#dee2e6') }} !important;">
+                        <div class="card-body p-3">
+                            @if($tahap['aktif'] && !$tahap['selesai'])
+                                <span class="badge mb-1"
+                                    style="background:#0a1628; color:#C9A84C; font-size:10px;">
+                                    🔵 Sedang Berlangsung
+                                </span>
+                            @elseif($tahap['selesai'])
+                                <span class="badge mb-1"
+                                    style="background:rgba(201,168,76,0.15); color:#C9A84C; font-size:10px;">
+                                    ✅ Selesai
+                                </span>
+                            @endif
+                            <h6 class="fw-bold mb-1" style="color:#0a1628;">
+                                {{ $tahap['judul'] }}
+                            </h6>
+                            <p class="mb-1"
+                                style="color:#C9A84C; font-size:12px; font-weight:600;">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ $tahap['tanggal'] }}
+                            </p>
+                            <p class="mb-0 text-muted" style="font-size:12px;">
+                                {{ $tahap['deskripsi'] }}
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Info Tambahan --}}
+        <div class="row g-3 mt-4">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                    style="background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3);">
+                    <i class="bi bi-calendar-range fs-4" style="color:#C9A84C;"></i>
+                    <div>
+                        <p class="fw-bold mb-0 small" style="color:#0a1628;">Periode Pendaftaran</p>
+                        <p class="mb-0 text-muted" style="font-size:12px;">
+                            {{ $buka->format('d M Y') }} — {{ $tutup->format('d M Y') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                    style="background:rgba(10,22,40,0.05); border:1px solid rgba(10,22,40,0.1);">
+                    <i class="bi bi-clock-history fs-4" style="color:#0a1628;"></i>
+                    <div>
+                        <p class="fw-bold mb-0 small" style="color:#0a1628;">Sisa Waktu Pendaftaran</p>
+                        <p class="mb-0 text-muted" style="font-size:12px;">
+                            @if($now->lt($buka))
+                                Dibuka {{ $buka->diffForHumans() }}
+                            @elseif($now->between($buka, $tutup))
+                                Ditutup {{ $tutup->diffForHumans() }}
+                            @else
+                                Pendaftaran telah ditutup
+                            @endif
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                    style="background:rgba(22,121,77,0.08); border:1px solid rgba(22,121,77,0.2);">
+                    <i class="bi bi-mortarboard fs-4" style="color:#16794d;"></i>
+                    <div>
+                        <p class="fw-bold mb-0 small" style="color:#0a1628;">Tahun Ajaran</p>
+                        <p class="mb-0 text-muted" style="font-size:12px;">
+                            {{ $periode->tahun_ajaran }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @else
+        {{-- Kalau tidak ada periode aktif --}}
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x fs-1 text-muted d-block mb-3"></i>
+            <h5 class="text-muted">Jadwal PPDB belum tersedia</h5>
+            <p class="text-muted small">Silakan pantau halaman ini untuk informasi lebih lanjut.</p>
+        </div>
+        @endif
+
+    </div>
+</section>
 
     <section id="pendaftaran" class="container-xxl py-5">
         <div class="container">

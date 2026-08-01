@@ -8,9 +8,34 @@ use App\Http\Controllers\InformasiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Informasi;
+use App\Models\PeriodePendaftaran;
 
 // ROUTE LANDING PAGE
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', function () {
+    // Ambil periode aktif untuk timeline
+    $periodeAktif = PeriodePendaftaran::where('is_aktif', true)->first();
+    $periode      = $periodeAktif; // alias, karena blade pakai 2 nama berbeda di section yang beda
+
+    // Ambil informasi PPDB untuk landing page (semua kategori, dipakai di beberapa section)
+    $informasis = Informasi::where('is_aktif', true)
+                           ->orderBy('urutan')
+                           ->get();
+
+    // Ambil khusus kategori "pengumuman" untuk banner berjalan
+    $pengumumans = Informasi::where('is_aktif', true)
+                            ->where('kategori', 'pengumuman')
+                            ->orderBy('urutan')
+                            ->get();
+
+    // Ambil khusus kategori "persyaratan" untuk section syarat pendaftaran
+    $persyaratans = Informasi::where('is_aktif', true)
+                             ->where('kategori', 'persyaratan')
+                             ->orderBy('urutan')
+                             ->get();
+
+    return view('welcome', compact('periodeAktif', 'periode', 'informasis', 'pengumumans', 'persyaratans'));
+});
 
 // ROUTE BAWAAN BREEZE
 require __DIR__.'/auth.php';
