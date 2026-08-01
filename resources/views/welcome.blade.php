@@ -341,77 +341,57 @@
                 Jadwal lengkap pelaksanaan penerimaan peserta didik baru
             </p>
         </div>
-
-        @if($periode)
+        
+@if($periode)
         @php
-            // Hitung tanggal otomatis dari periode
-            $buka         = \Carbon\Carbon::parse($periode->tanggal_buka);
-            $tutup        = \Carbon\Carbon::parse($periode->tanggal_tutup);
-            $verifikasi   = $buka->copy()->addDays(3);  // 3 hari setelah buka
-            $pengumuman   = $tutup->copy()->addDays(7); // 7 hari setelah tutup
-            $wawancara    = $tutup->copy()->addDays(14); // 14 hari setelah tutup
-            $hasilAkhir   = $tutup->copy()->addDays(21); // 21 hari setelah tutup
-            $daftarUlang  = $tutup->copy()->addDays(28); // 28 hari setelah tutup
-            $now          = \Carbon\Carbon::now();
+        $buka        = \Carbon\Carbon::parse($periode->tanggal_buka);
+        $tutup       = \Carbon\Carbon::parse($periode->tanggal_tutup);
+        $tesMulai    = \Carbon\Carbon::parse($periode->tanggal_tes_mulai);
+        $tesSelesai  = \Carbon\Carbon::parse($periode->tanggal_tes_selesai);
+        $pengumuman  = \Carbon\Carbon::parse($periode->tanggal_pengumuman);
+        $daftarUlangMulai   = \Carbon\Carbon::parse($periode->tanggal_daftar_ulang_mulai);
+        $daftarUlangSelesai = \Carbon\Carbon::parse($periode->tanggal_daftar_ulang_selesai);
+        $now = \Carbon\Carbon::now();
 
-            // Tentukan status tiap tahap
-            $tahapan = [
-                [
-                    'nomor'    => '01',
-                    'judul'    => 'Pendaftaran Dibuka',
-                    'tanggal'  => $buka->format('d M Y'),
-                    'deskripsi'=> 'Calon santri dapat mendaftar secara online melalui sistem PPDB.',
-                    'icon'     => 'bi-door-open',
-                    'selesai'  => $now->gte($buka),
-                    'aktif'    => $now->gte($buka) && $now->lt($tutup),
-                ],
-                [
-                    'nomor'    => '02',
-                    'judul'    => 'Batas Akhir Pendaftaran',
-                    'tanggal'  => $tutup->format('d M Y'),
-                    'deskripsi'=> 'Pendaftaran ditutup. Pastikan seluruh berkas dan bukti pembayaran sudah diunggah.',
-                    'icon'     => 'bi-calendar-x',
-                    'selesai'  => $now->gte($tutup),
-                    'aktif'    => $now->gte($verifikasi) && $now->lt($tutup),
-                ],
-                [
-                    'nomor'    => '03',
-                    'judul'    => 'Verifikasi Berkas',
-                    'tanggal'  => $verifikasi->format('d M Y').' - '.$tutup->format('d M Y'),
-                    'deskripsi'=> 'Panitia melakukan verifikasi kelengkapan berkas dan pembayaran pendaftar.',
-                    'icon'     => 'bi-file-earmark-check',
-                    'selesai'  => $now->gte($tutup),
-                    'aktif'    => $now->gte($verifikasi) && $now->lt($tutup),
-                ],
-                [
-                    'nomor'    => '04',
-                    'judul'    => 'Tes Wawancara',
-                    'tanggal'  => $wawancara->format('d M Y'),
-                    'deskripsi'=> 'Calon santri yang lolos verifikasi berkas mengikuti tes wawancara via Google Meet.',
-                    'icon'     => 'bi-camera-video',
-                    'selesai'  => $now->gte($wawancara),
-                    'aktif'    => $now->gte($tutup) && $now->lt($hasilAkhir),
-                ],
-                [
-                    'nomor'    => '05',
-                    'judul'    => 'Pengumuman Hasil',
-                    'tanggal'  => $hasilAkhir->format('d M Y'),
-                    'deskripsi'=> 'Hasil seleksi wawancara diumumkan melalui akun masing-masing calon santri.',
-                    'icon'     => 'bi-megaphone',
-                    'selesai'  => $now->gte($hasilAkhir),
-                    'aktif'    => $now->gte($wawancara) && $now->lt($daftarUlang),
-                ],
-                [
-                    'nomor'    => '06',
-                    'judul'    => 'Daftar Ulang',
-                    'tanggal'  => $daftarUlang->format('d M Y'),
-                    'deskripsi'=> 'Calon santri yang diterima wajib melakukan daftar ulang sesuai petunjuk panitia.',
-                    'icon'     => 'bi-check-circle',
-                    'selesai'  => $now->gte($daftarUlang),
-                    'aktif'    => $now->gte($hasilAkhir),
-                ],
-            ];
-        @endphp
+        $tahapan = [
+            [
+                'nomor'     => '01',
+                'judul'     => 'Batas Pendaftaran',
+                'tanggal'   => $buka->format('d M Y') . ' - ' . $tutup->format('d M Y'),
+                'deskripsi' => 'Calon santri mendaftar online dan panitia memverifikasi berkas selama periode ini.',
+                'icon'      => 'bi-door-open',
+                'selesai'   => $now->gt($tutup),
+                'aktif'     => $now->between($buka, $tutup),
+            ],
+            [
+                'nomor'     => '02',
+                'judul'     => 'Tes Wawancara',
+                'tanggal'   => $tesMulai->format('d M Y') . ' - ' . $tesSelesai->format('d M Y'),
+                'deskripsi' => 'Calon santri yang lolos verifikasi berkas mengikuti tes wawancara via Google Meet.',
+                'icon'      => 'bi-camera-video',
+                'selesai'   => $now->gt($tesSelesai),
+                'aktif'     => $now->between($tesMulai, $tesSelesai),
+            ],
+            [
+                'nomor'     => '03',
+                'judul'     => 'Pengumuman Kelulusan',
+                'tanggal'   => $pengumuman->format('d M Y'),
+                'deskripsi' => 'Hasil seleksi wawancara diumumkan melalui akun masing-masing calon santri.',
+                'icon'      => 'bi-megaphone',
+                'selesai'   => $now->gt($pengumuman),
+                'aktif'     => $now->isSameDay($pengumuman),
+            ],
+            [
+                'nomor'     => '04',
+                'judul'     => 'Daftar Ulang',
+                'tanggal'   => $daftarUlangMulai->format('d M Y') . ' - ' . $daftarUlangSelesai->format('d M Y'),
+                'deskripsi' => 'Calon santri yang diterima wajib melakukan daftar ulang sesuai petunjuk panitia.',
+                'icon'      => 'bi-check-circle',
+                'selesai'   => $now->gt($daftarUlangSelesai),
+                'aktif'     => $now->between($daftarUlangMulai, $daftarUlangSelesai),
+            ],
+        ];
+    @endphp
 
         {{-- Timeline Desktop --}}
         <div class="d-none d-lg-block">
@@ -449,7 +429,7 @@
             {{-- Cards Timeline --}}
             <div class="row g-3">
                 @foreach($tahapan as $index => $tahap)
-                <div class="col-lg-2">
+                <div class="col-lg-3">
                     <div class="card h-100 border-0 shadow-sm"
                         style="border-top: 3px solid {{ $tahap['selesai'] ? '#C9A84C' : ($tahap['aktif'] ? '#0a1628' : '#dee2e6') }} !important;
                                border-radius: 12px;">

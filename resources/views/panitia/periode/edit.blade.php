@@ -70,6 +70,55 @@
                             value="{{ old('tanggal_tutup', $periode->tanggal_tutup) }}"
                             class="form-control">
                     </div>
+                   <hr class="my-4">
+                    <h6 class="fw-bold text-muted mb-3">Tahap Selanjutnya</h6>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                Tes Wawancara Mulai <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" name="tanggal_tes_mulai"
+                                value="{{ old('tanggal_tes_mulai', $periode->tanggal_tes_mulai) }}"
+                                class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                Tes Wawancara Selesai <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" name="tanggal_tes_selesai"
+                                value="{{ old('tanggal_tes_selesai', $periode->tanggal_tes_selesai) }}"
+                                class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Tanggal Pengumuman Kelulusan <span class="text-danger">*</span>
+                        </label>
+                        <input type="date" name="tanggal_pengumuman"
+                            value="{{ old('tanggal_pengumuman', $periode->tanggal_pengumuman) }}"
+                            class="form-control">
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                Daftar Ulang Mulai <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" name="tanggal_daftar_ulang_mulai"
+                                value="{{ old('tanggal_daftar_ulang_mulai', $periode->tanggal_daftar_ulang_mulai) }}"
+                                class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                Daftar Ulang Selesai <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" name="tanggal_daftar_ulang_selesai"
+                                value="{{ old('tanggal_daftar_ulang_selesai', $periode->tanggal_daftar_ulang_selesai) }}"
+                                class="form-control">
+                        </div>
+                    </div>
 
                     <div class="mb-4 form-check">
                         <input type="checkbox" name="is_aktif" id="is_aktif" class="form-check-input"

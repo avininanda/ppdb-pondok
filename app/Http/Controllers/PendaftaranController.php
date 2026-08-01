@@ -256,6 +256,13 @@ class PendaftaranController extends Controller
     {
         $pendaftaran = Pendaftaran::where('user_id', auth()->id())->first();
 
+    // Cegah submit kalau periode pendaftaran sudah tutup
+    $periodeAktif = \App\Models\PeriodePendaftaran::where('is_aktif', true)->first();
+    if ($periodeAktif && now()->gt(\Carbon\Carbon::parse($periodeAktif->tanggal_tutup)->endOfDay())) {
+        return redirect()->route('pendaftaran.step3')
+                     ->with('error', 'Maaf, periode pendaftaran sudah ditutup pada ' . \Carbon\Carbon::parse($periodeAktif->tanggal_tutup)->format('d M Y') . '. Pendaftaran tidak dapat dilanjutkan.');
+    }
+
         // Validasi: pastikan semua dokumen sudah diupload
        if (!$pendaftaran->pas_foto || !$pendaftaran->file_kk || !$pendaftaran->file_akte || !$pendaftaran->file_ijazah || !$pendaftaran->file_bukti_bayar) {
         return redirect()->route('pendaftaran.step3')

@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class PeriodePendaftaran extends Model
 {
     protected $fillable = [
-        'tahun_ajaran',
-        'tanggal_buka',
-        'tanggal_tutup',
-        'is_aktif',
+    'tahun_ajaran',
+    'tanggal_buka',
+    'tanggal_tutup',
+    'tanggal_tes_mulai',
+    'tanggal_tes_selesai',
+    'tanggal_pengumuman',
+    'tanggal_daftar_ulang_mulai',
+    'tanggal_daftar_ulang_selesai',
+    'is_aktif',
     ];
 
     public function sedangDibuka(): bool
