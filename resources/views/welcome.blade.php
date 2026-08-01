@@ -252,22 +252,22 @@
 
             {{-- Step 1 --}}
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="flow-card h-100">
+             <div class="flow-card h-100">
+                <div class="flow-card-head">
                     <span>01</span>
-                    <div class="flow-icon mb-3">
-                        <i class="bi bi-file-text fs-1" style="color:#C9A84C;"></i>
-                    </div>
-                    <h5>Baca Informasi PPDB</h5>
-                    <p>Baca syarat pendaftaran dan dokumen yang diperlukan sebelum mulai mendaftar.</p>
+                    <i class="bi bi-file-text"></i>
                 </div>
+                <h5>Baca Informasi PPDB</h5>
+                <p>Baca syarat pendaftaran dan dokumen yang diperlukan sebelum mulai mendaftar.</p>
+            </div>
             </div>
 
             {{-- Step 2 --}}
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.2s">
                 <div class="flow-card h-100">
-                    <span>02</span>
-                    <div class="flow-icon mb-3">
-                        <i class="bi bi-person-plus fs-1" style="color:#C9A84C;"></i>
+                    <div class="flow-card-head">
+                        <span>02</span>
+                        <i class="bi bi-file-text"></i>
                     </div>
                     <h5>Buat Akun & Masuk</h5>
                     <p>Klik tombol <strong>"Daftar"</strong>, isi nama, email, dan password. Lalu masuk ke akun kamu.</p>
@@ -277,9 +277,9 @@
             {{-- Step 3 --}}
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                 <div class="flow-card h-100">
-                    <span>03</span>
-                    <div class="flow-icon mb-3">
-                        <i class="bi bi-pencil-square fs-1" style="color:#C9A84C;"></i>
+                    <div class="flow-card-head">
+                        <span>03</span>
+                        <i class="bi bi-file-text"></i>
                     </div>
                     <h5>Isi Formulir Online</h5>
                     <p>Isi data diri calon santri dan data orang tua secara lengkap melalui formulir bertahap.</p>
@@ -288,10 +288,10 @@
 
             {{-- Step 4 --}}
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.4s">
-                <div class="flow-card h-100">
-                    <span>04</span>
-                    <div class="flow-icon mb-3">
-                        <i class="bi bi-upload fs-1" style="color:#C9A84C;"></i>
+                 <div class="flow-card h-100">
+                    <div class="flow-card-head">
+                        <span>04</span>
+                        <i class="bi bi-file-text"></i>
                     </div>
                     <h5>Upload Berkas & Bukti Bayar</h5>
                     <p>Upload foto/scan KK, Akte Kelahiran, Ijazah, dan bukti transfer biaya pendaftaran.</p>
@@ -300,10 +300,10 @@
 
             {{-- Step 5 --}}
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="flow-card h-100">
-                    <span>05</span>
-                    <div class="flow-icon mb-3">
-                        <i class="bi bi-camera-video fs-1" style="color:#C9A84C;"></i>
+                     <div class="flow-card h-100">
+                    <div class="flow-card-head">
+                        <span>05</span>
+                        <i class="bi bi-file-text"></i>
                     </div>
                     <h5>Verifikasi & Tes Wawancara</h5>
                     <p>Panitia memeriksa berkas kamu. Jika lolos, jadwal tes wawancara via Google Meet akan dikirim.</p>
@@ -313,20 +313,18 @@
             {{-- Step 6 --}}
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.6s">
                 <div class="flow-card h-100">
-                    <span>06</span>
-                    <div class="flow-icon mb-3">
-                        <i class="bi bi-megaphone fs-1" style="color:#C9A84C;"></i>
+                    <div class="flow-card-head">
+                        <span>06</span>
+                        <i class="bi bi-file-text"></i>
                     </div>
                     <h5>Pengumuman & Daftar Ulang</h5>
-                    <p>Cek hasil wawancara di akun kamu. Jika diterima, lakukan daftar ulang sesuai petunjuk panitia.</p>
+                <p>Cek hasil wawancara di akun kamu. Jika diterima, lakukan daftar ulang sesuai petunjuk panitia.</p>
                 </div>
             </div>
     </section>
 
-    {{-- ================================================
-     SECTION TIMELINE PPDB
-     Dinamis dari database periode pendaftaran
-================================================ --}}
+
+<!-- Timeline Start -->
 <section id="timeline" class="py-5" style="background: #f8f9fa;">
     <div class="container">
 
@@ -675,6 +673,7 @@
             </div>
         </div>
     </section>
+<!-- Timeline End -->
 
     <!-- Kegiatan Start -->
     <section id="kegiatan" class="container-xxl py-5">
