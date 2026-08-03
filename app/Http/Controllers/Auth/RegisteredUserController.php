@@ -12,14 +12,22 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Models\PeriodePendaftaran;
+
 
 class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      */
-    public function create(): View
+   public function create(): View|RedirectResponse
     {
+        $pendaftaranDibuka = PeriodePendaftaran::where('is_aktif', true)->exists();
+
+        if (!$pendaftaranDibuka) {
+            return redirect()->route('login')
+                ->with('error', 'Pendaftaran akun baru saat ini sedang ditutup.');
+        }
         return view('auth.register');
     }
 
@@ -30,6 +38,12 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+            $pendaftaranDibuka = PeriodePendaftaran::where('is_aktif', true)->exists();
+
+            if (!$pendaftaranDibuka) {
+                return redirect()->route('login')
+                    ->with('error', 'Pendaftaran akun baru saat ini sedang ditutup.');
+            }
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => [

@@ -66,16 +66,11 @@
                     <a href="#tentang" class="nav-item nav-link">Tentang</a>
                     <a href="#kurikulum" class="nav-item nav-link">Kurikulum</a>
                     <a href="#alur" class="nav-item nav-link">Alur PPDB</a>
+                    <a href="#timeline" class="nav-item nav-link">Timeline PPDB</a>
                     <a href="#kegiatan" class="nav-item nav-link">Kegiatan</a>
                 </div>
                     <div class="d-none d-lg-flex ms-lg-3">
-                    @if($pendaftaranDibuka)
-                        <a href="{{ route('register') }}" class="btn btn-primary py-2 px-4">Daftar</a>
-                    @else
-                        <button type="button" class="btn px-4 btn-closed-state" disabled>
-                            <i class="fa fa-lock me-1"></i>Ditutup
-                        </button>
-                    @endif
+                    <a href="{{ route('login') }}" class="btn btn-primary py-2 px-4">Masuk</a>
                 </div>
             </div>
         </nav>
@@ -110,7 +105,8 @@
                                                     {{-- Pengumuman tambahan dari panitia, kalau ada --}}
                                                     @forelse($pengumumans as $info)
                                                         <span class="text-white-50 mx-3">&bull;</span>
-                                                        <span class="text-uppercase text-white text-marquee-item">{{ $info->judul }}</span>
+                                                        <span class="text-uppercase text-white text-marquee-item">
+                                                        <strong>{{ $info->judul }}</strong> — {{ $info->konten }}</span>
                                                     @empty
                                                     @endforelse
                                                     </div>
@@ -295,6 +291,10 @@
                     </div>
                     <h5>Upload Berkas & Bukti Bayar</h5>
                     <p>Upload foto/scan KK, Akte Kelahiran, Ijazah, dan bukti transfer biaya pendaftaran.</p>
+                    <div class="mt-3 p-2 px-3 rounded border border-warning-subtle bg-warning-subtle bg-opacity-25 d-flex align-items-center justify-content-between">
+                        <small class="text-muted fw-semibold">Biaya Pendaftaran:</small>
+                        <strong class="text-dark fs-6">Rp 350.000</strong>
+                    </div>
                 </div>
             </div>
 
@@ -341,7 +341,7 @@
                 Jadwal lengkap pelaksanaan penerimaan peserta didik baru
             </p>
         </div>
-        
+
 @if($periode)
         @php
         $buka        = \Carbon\Carbon::parse($periode->tanggal_buka);
@@ -614,7 +614,7 @@
                     <h2 class="display-6 mb-4">Siapkan Data Sebelum Mendaftar</h2>
                     <ul class="requirement-list">
                         @forelse($persyaratans as $syarat)
-                            <li><i class="fa fa-check-circle"></i> {{ $syarat->judul }}</li>
+                            <li><i class="fa fa-check-circle"></i> {{ $syarat->konten }}</li>
                         @empty
                             {{-- Fallback kalau panitia belum input persyaratan --}}
                             <li><i class="fa fa-file-alt"></i> Identitas calon santri dan data orang tua atau wali.</li>
@@ -647,7 +647,6 @@
                             <i class="fa fa-lock me-2"></i>{{ $statusTutup }}
                         </button>
                     @endif
-                        <a href="{{ route('login') }}" class="btn btn-outline-light py-3 px-5 rounded-pill ms-lg-2 mt-3 mt-lg-0">Masuk</a>
                     </div>
                 </div>
             </div>
@@ -780,7 +779,8 @@
                     <a class="btn btn-link" href="#tentang">Tentang Kami</a>
                     <a class="btn btn-link" href="#kurikulum">Kurikulum 4T dan 1K</a>
                     <a class="btn btn-link" href="#alur">Alur Pendaftaran</a>
-                    <a class="btn btn-link" href="#alur">Kegiatan</a>
+                    <a class="btn btn-link" href="#timeline">Timeline Pendaftaran</a>
+                    <a class="btn btn-link" href="#kegiatan">Kegiatan</a>
                     @if($pendaftaranDibuka)
                         <a class="btn btn-link" href="{{ route('register') }}">Daftar Online</a>
                     @else

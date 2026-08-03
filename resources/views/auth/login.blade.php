@@ -96,10 +96,15 @@
 
                         <hr class="divider">
 
+                        @if($pendaftaranDibuka)
                         <p class="text-center" style="font-size:13px; color:#888;">
                             Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
                         </p>
-
+                        @else
+                        <p class="text-center" style="font-size:13px; color:#888;">
+                            <i class="bi bi-lock-fill me-1"></i> Pendaftaran akun baru saat ini sedang ditutup.
+                        </p>
+                    @endif
                     </div>
 
                 </div>
