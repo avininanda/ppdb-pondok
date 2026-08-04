@@ -113,47 +113,73 @@
                     {{-- Cek status_akhir dulu (hasil wawancara)
                         baru fallback ke status_verifikasi (status berkas) --}}
                     @if($pendaftaran->status_akhir === 'diterima')
-                        <span class="badge text-bg-success fs-5 px-4 py-2">
+                        <span class="badge text-bg-success fs-6 px-4 py-2">
                             🎉 Selamat! Kamu Diterima!
                         </span>
                     @elseif($pendaftaran->status_akhir === 'ditolak')
-                        <span class="badge text-bg-danger fs-5 px-4 py-2">
+                        <span class="badge text-bg-danger fs-6 px-4 py-2">
                             😔 Maaf, Belum Diterima
                         </span>
                     @elseif($pendaftaran->status_draft === 'draft')
-                        <span class="badge text-bg-warning fs-5 px-4 py-2">
+                        <span class="badge text-bg-warning fs-6 px-4 py-2">
                             📝 Draft — Belum Disubmit
                         </span>
                     @elseif($pendaftaran->status_verifikasi === 'pending')
-                        <span class="badge text-bg-warning fs-5 px-4 py-2">
+                        <span class="badge text-bg-warning fs-6 px-4 py-2">
                             ⏳ Menunggu Pemeriksaan Berkas
                         </span>
                         <p class="text-muted small mt-2 mb-0">
                             Panitia sedang memeriksa berkas pendaftaran kamu.
                         </p>
                     @elseif($pendaftaran->status_verifikasi === 'diverifikasi' && $pendaftaran->jadwal && $pendaftaran->jadwal->sudah_dilaksanakan)
-                        <span class="badge text-bg-info fs-5 px-4 py-2">
+                        <span class="badge text-bg-info fs-6 px-4 py-2">
                             Menunggu Hasil Tes 
                         </span>
                         <p class="text-muted small mt-2 mb-0">
                             Tes kamu sudah selesai dilaksanakan. Panitia sedang memproses keputusan.
                         </p>
                     @elseif($pendaftaran->status_verifikasi === 'diverifikasi' && $pendaftaran->jadwal)
-                        <span class="badge text-bg-info fs-5 px-4 py-2">
+                        <span class="badge text-bg-info fs-6 px-4 py-2">
                             📅 Jadwal Wawancara Sudah Ditetapkan
                         </span>
                         <p class="text-muted small mt-2 mb-0">
                             Cek detail tanggal, jam, dan link wawancara di panel sebelah kanan.
-                        </p>
-                    @elseif($pendaftaran->status_verifikasi === 'diverifikasi')
-                        <span class="badge text-bg-info fs-5 px-4 py-2">
-                            ✅ Berkas Valid — Menunggu Jadwal Wawancara
+
+                @elseif($pendaftaran->status_verifikasi === 'diverifikasi')
+                    {{-- Cek status pembayaran --}}
+                    @if($pendaftaran->status_pembayaran === 'terverifikasi')
+                        <span class="badge text-bg-info fs-7 px-4 py-2">
+                            ✅ Berkas & Pembayaran Valid — Menunggu Jadwal Wawancara
                         </span>
                         <p class="text-muted small mt-2 mb-0">
-                            Berkas kamu sudah valid. Tunggu jadwal wawancara dari panitia.
+                            Semua persyaratan sudah terpenuhi.
+                            Tunggu jadwal wawancara dari panitia.
                         </p>
+                    @elseif($pendaftaran->status_pembayaran === 'menunggu_verifikasi')
+                        <span class="badge text-bg-warning fs-6 px-4 py-2">
+                            ✅ Berkas Valid — ⏳Menunggu Verifikasi Pembayaran
+                        </span>
+                        <p class="text-muted small mt-2 mb-0">
+                            Berkas kamu sudah valid. Panitia sedang
+                            memverifikasi bukti pembayaran kamu.
+                        </p>
+                    @else
+                        <span class="badge text-bg-warning fs-6 px-4 py-2">
+                            ✅ Berkas Valid — ⚠️ Bukti Pembayaran Belum Diunggah
+                        </span>
+                        <p class="text-muted small mt-2 mb-0">
+                            Berkas kamu sudah valid. Silakan upload
+                            bukti pembayaran untuk melanjutkan proses.
+                        </p>
+                        <a href="{{ route('pendaftaran.step3') }}"
+                            class="btn btn-warning btn-sm mt-2">
+                            <i class="bi bi-upload me-1"></i>
+                            Upload Bukti Pembayaran
+                        </a>
+                    @endif
+            
                     @elseif($pendaftaran->status_verifikasi === 'revisi')
-                        <span class="badge text-bg-warning fs-5 px-4 py-2">
+                        <span class="badge text-bg-warning fs-6 px-4 py-2">
                             ⚠️ Berkas Perlu Diperbaiki
                         </span>
                         @if($pendaftaran->catatan)
@@ -166,7 +192,7 @@
                             <i class="bi bi-upload me-1"></i>Upload Ulang Dokumen
                         </a>
                     @elseif($pendaftaran->status_verifikasi === 'ditolak')
-                        <span class="badge text-bg-danger fs-5 px-4 py-2">
+                        <span class="badge text-bg-danger fs-6 px-4 py-2">
                             ❌ Maaf, Tidak Memenuhi Syarat
                         </span>
                         <p class="text-muted small mt-2 mb-0">

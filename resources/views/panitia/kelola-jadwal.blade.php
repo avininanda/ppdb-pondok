@@ -107,7 +107,6 @@
                             <span class="badge text-bg-warning ms-1">Hari Ini</span>
                         @endif
                     </p>
-                    <p class="text-muted small mb-0">{{ $p->user->email ?? '-' }}</p>
                 </td>
                 <td>{{ $p->asal_sekolah }}</td>
                 <td>
