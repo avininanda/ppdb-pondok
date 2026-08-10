@@ -114,3 +114,13 @@ require __DIR__.'/auth.php';
     // Status pendaftaran
     Route::get('/status', [PendaftaranController::class, 'status'])->name('pendaftaran.status');
 });
+
+Route::get('/storage/dokumen/{filename}', function ($filename) {
+    $path = storage_path('app/public/dokumen/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
