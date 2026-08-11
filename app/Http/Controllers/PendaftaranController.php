@@ -126,33 +126,59 @@ class PendaftaranController extends Controller
         return view('santri.daftar.step2', compact('pendaftaran'));
     }
 
-    public function simpanStep2(Request $request)
-    {
-        $request->validate([
-            'nama_ayah'      => 'required|string|max:255',
-            'pekerjaan_ayah' => 'required|string|max:255',
-            'nama_ibu'       => 'required|string|max:255',
-            'pekerjaan_ibu'  => 'required|string|max:255',
-            'hp_ortu'        => [ 'required','string','min:10','max:15','regex:/^[0-9+\-\s]+$/'],
-        ], [
-            'nama_ayah.required'      => 'Nama ayah wajib diisi.',
-            'pekerjaan_ayah.required' => 'Pekerjaan ayah wajib diisi.',
-            'nama_ibu.required'       => 'Nama ibu wajib diisi.',
-            'pekerjaan_ibu.required'  => 'Pekerjaan ibu wajib diisi.',
-            'hp_ortu.required'        => 'Nomor HP orang tua wajib diisi.',
-        ]);
+ public function simpanStep2(Request $request)
+{
+    $statusOrtu = $request->status_ortu;
 
-        // Update data orang tua ke pendaftaran yang sudah ada
-        Pendaftaran::where('user_id', auth()->id())->update([
-            'nama_ayah'      => $request->nama_ayah,
-            'pekerjaan_ayah' => $request->pekerjaan_ayah,
-            'nama_ibu'       => $request->nama_ibu,
-            'pekerjaan_ibu'  => $request->pekerjaan_ibu,
-            'hp_ortu'        => $request->hp_ortu,
-        ]);
+    $rules = [
+        'status_ortu' => 'required|in:lengkap,yatim,piatu,yatim_piatu,wali',
+        'hp_ortu'     => 'required|string|min:10|max:15|regex:/^[0-9+\-\s]+$/',
+    ];
 
-        return redirect()->route('pendaftaran.step3');
+    // Validasi ayah hanya kalau bukan yatim/yatim_piatu/wali
+    if (!in_array($statusOrtu, ['yatim', 'yatim_piatu', 'wali'])) {
+        $rules['nama_ayah']      = 'required|string|max:255';
+        $rules['pekerjaan_ayah'] = 'required|string|max:255';
     }
+
+    // Validasi ibu hanya kalau bukan piatu/yatim_piatu/wali
+    if (!in_array($statusOrtu, ['piatu', 'yatim_piatu', 'wali'])) {
+        $rules['nama_ibu']      = 'required|string|max:255';
+        $rules['pekerjaan_ibu'] = 'required|string|max:255';
+    }
+
+    // Validasi wali kalau status yatim_piatu atau wali
+    if (in_array($statusOrtu, ['yatim_piatu', 'wali'])) {
+        $rules['nama_wali']      = 'required|string|max:255';
+        $rules['hubungan_wali']  = 'required|string|max:255';
+    }
+
+    $request->validate($rules, [
+        'status_ortu.required'   => 'Status orang tua wajib dipilih.',
+        'nama_ayah.required'     => 'Nama ayah wajib diisi.',
+        'pekerjaan_ayah.required'=> 'Pekerjaan ayah wajib diisi.',
+        'nama_ibu.required'      => 'Nama ibu wajib diisi.',
+        'pekerjaan_ibu.required' => 'Pekerjaan ibu wajib diisi.',
+        'nama_wali.required'     => 'Nama wali wajib diisi.',
+        'hubungan_wali.required' => 'Hubungan wali wajib diisi.',
+        'hp_ortu.required'       => 'Nomor HP wajib diisi.',
+        'hp_ortu.min'            => 'Nomor HP minimal 10 digit.',
+        'hp_ortu.regex'          => 'Nomor HP hanya boleh berisi angka.',
+    ]);
+
+    Pendaftaran::where('user_id', auth()->id())->update([
+        'status_ortu'    => $statusOrtu,
+        'nama_ayah'      => in_array($statusOrtu, ['yatim', 'yatim_piatu', 'wali']) ? null : $request->nama_ayah,
+        'pekerjaan_ayah' => in_array($statusOrtu, ['yatim', 'yatim_piatu', 'wali']) ? null : $request->pekerjaan_ayah,
+        'nama_ibu'       => in_array($statusOrtu, ['piatu', 'yatim_piatu', 'wali']) ? null : $request->nama_ibu,
+        'pekerjaan_ibu'  => in_array($statusOrtu, ['piatu', 'yatim_piatu', 'wali']) ? null : $request->pekerjaan_ibu,
+        'nama_wali'      => $request->nama_wali,
+        'hubungan_wali'  => $request->hubungan_wali,
+        'hp_ortu'        => $request->hp_ortu,
+    ]);
+
+    return redirect()->route('pendaftaran.step3');
+}
 
 
     // =========================================================

@@ -80,17 +80,31 @@
         </div>
     </div>
 
-    {{-- Data Orang Tua --}}
-    <div class="col-12 col-md-6">
-        <div class="panel p-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">👨‍👩‍👧 Data Orang Tua</h5>
-                <a href="{{ route('pendaftaran.step2') }}"
-                    class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-pencil me-1"></i>Edit
-                </a>
+   {{-- Data Orang Tua / Wali --}}
+<div class="col-12 col-md-6">
+    <div class="panel p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">👨‍👩‍👧 Data Orang Tua / Wali</h5>
+            <a href="{{ route('pendaftaran.step2') }}"
+                class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil me-1"></i>Edit
+            </a>
+        </div>
+        <div class="text-muted small">
+            <div class="d-flex justify-content-between py-2 border-bottom">
+                <span>Status Orang Tua</span>
+                <span class="fw-semibold text-dark">
+                    @switch($pendaftaran->status_ortu)
+                        @case('yatim') Yatim (Ayah telah meninggal) @break
+                        @case('piatu') Piatu (Ibu telah meninggal) @break
+                        @case('yatim_piatu') Yatim Piatu @break
+                        @case('wali') Diasuh Wali @break
+                        @default Orang Tua Lengkap
+                    @endswitch
+                </span>
             </div>
-            <div class="text-muted small">
+
+            @if(!in_array($pendaftaran->status_ortu, ['yatim', 'yatim_piatu', 'wali']))
                 <div class="d-flex justify-content-between py-2 border-bottom">
                     <span>Nama Ayah</span>
                     <span class="fw-semibold text-dark">{{ $pendaftaran->nama_ayah }}</span>
@@ -99,6 +113,9 @@
                     <span>Pekerjaan Ayah</span>
                     <span class="fw-semibold text-dark">{{ $pendaftaran->pekerjaan_ayah }}</span>
                 </div>
+            @endif
+
+            @if(!in_array($pendaftaran->status_ortu, ['piatu', 'yatim_piatu', 'wali']))
                 <div class="d-flex justify-content-between py-2 border-bottom">
                     <span>Nama Ibu</span>
                     <span class="fw-semibold text-dark">{{ $pendaftaran->nama_ibu }}</span>
@@ -107,13 +124,26 @@
                     <span>Pekerjaan Ibu</span>
                     <span class="fw-semibold text-dark">{{ $pendaftaran->pekerjaan_ibu }}</span>
                 </div>
-                <div class="d-flex justify-content-between py-2">
-                    <span>HP Orang Tua</span>
-                    <span class="fw-semibold text-dark">{{ $pendaftaran->hp_ortu }}</span>
+            @endif
+
+            @if(in_array($pendaftaran->status_ortu, ['yatim_piatu', 'wali']))
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span>Nama Wali</span>
+                    <span class="fw-semibold text-dark">{{ $pendaftaran->nama_wali }}</span>
                 </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span>Hubungan dengan Santri</span>
+                    <span class="fw-semibold text-dark">{{ $pendaftaran->hubungan_wali }}</span>
+                </div>
+            @endif
+
+            <div class="d-flex justify-content-between py-2">
+                <span>HP Orang Tua / Wali</span>
+                <span class="fw-semibold text-dark">{{ $pendaftaran->hp_ortu }}</span>
             </div>
         </div>
     </div>
+</div>
 
 {{-- Dokumen & Pembayaran --}}
 <div class="col-12">

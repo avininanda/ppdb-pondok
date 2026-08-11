@@ -84,39 +84,76 @@
             </div>
         </div>
 
-        {{-- Data Orang Tua --}}
-        <div class="panel mb-3">
-            <div class="panel-header">
-                <h2 class="h5 mb-0 section-title">
-                    <i class="bi bi-people"></i>
-                    <span>Data Orang Tua</span>
-                </h2>
-            </div>
-            <div class="p-3">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <p class="text-muted small mb-1">Nama Ayah</p>
-                        <p class="fw-semibold mb-0">{{ $pendaftaran->nama_ayah }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="text-muted small mb-1">Pekerjaan Ayah</p>
-                        <p class="fw-semibold mb-0">{{ $pendaftaran->pekerjaan_ayah }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="text-muted small mb-1">Nama Ibu</p>
-                        <p class="fw-semibold mb-0">{{ $pendaftaran->nama_ibu }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="text-muted small mb-1">Pekerjaan Ibu</p>
-                        <p class="fw-semibold mb-0">{{ $pendaftaran->pekerjaan_ibu }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="text-muted small mb-1">HP Orang Tua</p>
-                        <p class="fw-semibold mb-0">{{ $pendaftaran->hp_ortu }}</p>
-                    </div>
+{{-- Data Orang Tua / Wali --}}
+<div class="panel mb-3">
+    <div class="panel-header">
+        <h2 class="h5 mb-0 section-title">
+            <i class="bi bi-people"></i>
+            <span>Data Orang Tua / Wali</span>
+        </h2>
+    </div>
+    <div class="p-3">
+
+        {{-- Badge Status Ortu --}}
+        <div class="mb-3">
+            @if($pendaftaran->status_ortu === 'yatim')
+                <span class="badge text-bg-warning">Yatim</span>
+            @elseif($pendaftaran->status_ortu === 'piatu')
+                <span class="badge text-bg-warning">Piatu</span>
+            @elseif($pendaftaran->status_ortu === 'yatim_piatu')
+                <span class="badge text-bg-danger">Yatim Piatu</span>
+            @elseif($pendaftaran->status_ortu === 'wali')
+                <span class="badge text-bg-info">Diasuh Wali</span>
+            @else
+                <span class="badge text-bg-success">Orang Tua Lengkap</span>
+            @endif
+        </div>
+
+        <div class="row g-3">
+            {{-- Data Ayah --}}
+            @if(!in_array($pendaftaran->status_ortu, ['yatim', 'yatim_piatu', 'wali']))
+                <div class="col-md-6">
+                    <p class="text-muted small mb-1">Nama Ayah</p>
+                    <p class="fw-semibold mb-0">{{ $pendaftaran->nama_ayah ?? '-' }}</p>
                 </div>
+                <div class="col-md-6">
+                    <p class="text-muted small mb-1">Pekerjaan Ayah</p>
+                    <p class="fw-semibold mb-0">{{ $pendaftaran->pekerjaan_ayah ?? '-' }}</p>
+                </div>
+            @endif
+
+            {{-- Data Ibu --}}
+            @if(!in_array($pendaftaran->status_ortu, ['piatu', 'yatim_piatu', 'wali']))
+                <div class="col-md-6">
+                    <p class="text-muted small mb-1">Nama Ibu</p>
+                    <p class="fw-semibold mb-0">{{ $pendaftaran->nama_ibu ?? '-' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="text-muted small mb-1">Pekerjaan Ibu</p>
+                    <p class="fw-semibold mb-0">{{ $pendaftaran->pekerjaan_ibu ?? '-' }}</p>
+                </div>
+            @endif
+
+            {{-- Data Wali --}}
+            @if(in_array($pendaftaran->status_ortu, ['yatim_piatu', 'wali']))
+                <div class="col-md-6">
+                    <p class="text-muted small mb-1">Nama Wali</p>
+                    <p class="fw-semibold mb-0">{{ $pendaftaran->nama_wali ?? '-' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="text-muted small mb-1">Hubungan dengan Santri</p>
+                    <p class="fw-semibold mb-0">{{ $pendaftaran->hubungan_wali ?? '-' }}</p>
+                </div>
+            @endif
+
+            {{-- HP Ortu --}}
+            <div class="col-md-6">
+                <p class="text-muted small mb-1">HP yang Bisa Dihubungi</p>
+                <p class="fw-semibold mb-0">{{ $pendaftaran->hp_ortu ?? '-' }}</p>
             </div>
         </div>
+    </div>
+</div>
 
         {{-- Dokumen --}}
         <div class="panel mb-3">
