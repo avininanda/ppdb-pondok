@@ -43,24 +43,36 @@ class PanitiaController extends Controller
     // KELOLA PENDAFTAR — Semua pendaftar untuk
     // verifikasi berkas
     // ============================================
-    public function pendaftar(Request $request)
-    {
-    $search = $request->query('search');
+public function pendaftar(Request $request)
+{
+$search = $request->query('search');
+$status = $request->query('status');
 
-    $pendaftars = Pendaftaran::where('status_draft', 'submit')
-                              ->with('user', 'hasilTes')
-                              ->when($search, function ($query) use ($search) {
-                                $query->where(function($q) use ($search) {
-                                    $q->where('nama', 'like', '%' . $search . '%')
-                                    ->orWhere('nomor_pendaftaran', 'like', '%' . $search . '%');
-                                });
-                                })
-                              ->latest()
-                              ->paginate(20)
-                              ->withQueryString();
+$pendaftars = Pendaftaran::where('status_draft', 'submit')
+                          ->with('user', 'hasilTes')
+                          ->when($search, function ($query) use ($search) {
+                            $query->where(function($q) use ($search) {
+                                $q->where('nama', 'like', '%' . $search . '%')
+                                ->orWhere('nomor_pendaftaran', 'like', '%' . $search . '%');
+                            });
+                            })
+                          ->when($status, function ($query) use ($status) {
+                            match ($status) {
+                                'pending'   => $query->where('status_verifikasi', 'pending'),
+                                'diterima'  => $query->where('status_akhir', 'diterima'),
+                                'ditolak'   => $query->where(function ($q) {
+                                                  $q->where('status_verifikasi', 'ditolak')
+                                                    ->orWhere('status_akhir', 'ditolak');
+                                               }),
+                                default     => null,
+                            };
+                            })
+                          ->latest()
+                          ->paginate(20)
+                          ->withQueryString();
 
-    return view('panitia.pendaftar', compact('pendaftars'));
-    }
+return view('panitia.pendaftar', compact('pendaftars', 'status'));
+}
 
     // ============================================
     // DETAIL PENDAFTAR
