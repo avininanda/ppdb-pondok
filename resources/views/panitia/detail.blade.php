@@ -12,6 +12,7 @@
             <h1 class="h3 mb-1">{{ $pendaftaran->nama }}</h1>
             <p class="text-muted mb-0">
                 No. Pendaftaran: <strong class="text-dark">{{ $pendaftaran->nomor_pendaftaran ?? '-' }}</strong>
+                <i class="bi bi-envelope me-1"></i>{{ $pendaftaran->user->email ?? '-' }}
             </p>
         </div>
     </div>

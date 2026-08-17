@@ -61,6 +61,7 @@
                     </td>
                     <td>
                         <p class="fw-semibold mb-0 text-truncate" style="max-width: 220px;">{{ $p->nama }}</p>
+                        <p class="text-muted small mb-0">{{ $p->user->email ?? '-' }}</p>
                     </td>
                     <td class="text-truncate" style="max-width: 180px;">{{ $p->asal_sekolah }}</td>
                     <td class="text-nowrap">{{ \Carbon\Carbon::parse($p->created_at)->format('d M Y') }}</td>
