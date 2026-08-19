@@ -101,6 +101,11 @@ class Pendaftaran extends Model
         return $this->hasOne(HasilTes::class);
     }
 
+    public function penilaianTes()
+    {
+    return $this->hasMany(PenilaianTes::class, 'pendaftaran_id');
+    }
+
     public function periode()
     {
     return $this->belongsTo(PeriodePendaftaran::class, 'periode_pendaftaran_id');

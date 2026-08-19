@@ -130,6 +130,29 @@
         </div>
     </div>
 
+        {{-- Opsi Wawancara Ulang (Muncul jika nilai < 75 atau tidak lulus) --}}
+    <div class="panel mb-3 border-warning" id="wawancara-ulang-section">
+        <div class="panel-header bg-light">
+            <h2 class="h5 mb-0 text-warning-emphasis">
+                <i class="bi bi-arrow-repeat me-1"></i>
+                <span>Pertimbangan Wawancara Ulang</span>
+            </h2>
+        </div>
+        <div class="p-4">
+            <p class="text-muted small mb-3">
+                Peserta yang belum mencapai batas kelulusan (Nilai < 75) dapat diberikan kesempatan untuk melakukan tes wawancara ulang.
+            </p>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" 
+                    id="bisa_wawancara_ulang" name="bisa_wawancara_ulang" value="1"
+                    {{ isset($hasil) && $hasil->bisa_wawancara_ulang ? 'checked' : '' }}>
+                <label class="form-check-label fw-semibold" for="bisa_wawancara_ulang">
+                    Berikan kesempatan kepada peserta untuk mengikuti wawancara ulang
+                </label>
+            </div>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary w-100 py-3">
         <i class="bi bi-save me-2"></i>
         Simpan Penilaian

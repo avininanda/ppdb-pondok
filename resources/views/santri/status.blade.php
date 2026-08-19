@@ -21,12 +21,10 @@
 
     {{-- ================================================
          STATUS BADGE — Bagian paling atas
-         Menampilkan status terkini pendaftaran
     ================================================ --}}
     <div class="col-12">
         <div class="panel p-4 text-center">
 
-            {{-- Nomor Pendaftaran --}}
             @if($pendaftaran->nomor_pendaftaran)
                 <p class="text-muted small mb-1">Nomor Pendaftaran</p>
                 <h4 class="fw-bold text-primary mb-3">
@@ -34,8 +32,6 @@
                 </h4>
             @endif
 
-            {{-- Cek status_akhir dulu (hasil wawancara)
-            baru fallback ke status_verifikasi (status berkas) --}}
         @if($pendaftaran->status_akhir === 'diterima')
             <span class="badge text-bg-success fs-6 px-4 py-2">
                 🎉 Selamat! Kamu Diterima!
@@ -44,6 +40,13 @@
             <span class="badge text-bg-danger fs-6 px-4 py-2">
                 😔 Maaf, Belum Diterima
             </span>
+        @elseif($pendaftaran->status_akhir === 'wawancara_ulang')
+            <span class="badge text-bg-warning fs-6 px-4 py-2">
+                🔄 Dijadwalkan Wawancara Ulang
+            </span>
+            <p class="text-muted small mt-2 mb-0">
+                Nilai tes sebelumnya belum memenuhi syarat minimum. Panitia telah memberikan kesempatan wawancara ulang. Silakan cek jadwal terbaru dan catatan evaluasi di bawah ini.
+            </p>
         @elseif($pendaftaran->status_draft === 'draft')
             <span class="badge text-bg-warning fs-6 px-4 py-2">
                 📝 Draft — Belum Disubmit
@@ -69,64 +72,84 @@
             <p class="text-muted small mt-2 mb-0">
                 Cek detail tanggal, jam, dan link wawancara di bagian "Jadwal Tes Wawancara" di bawah ini.
             </p>
-
         @elseif($pendaftaran->status_verifikasi === 'diverifikasi')
-            {{-- Cek status pembayaran --}}
             @if($pendaftaran->status_pembayaran === 'terverifikasi')
                 <span class="badge text-bg-info fs-6 px-4 py-2">
                     ✅ Berkas & Pembayaran Valid — Menunggu Jadwal Wawancara
                 </span>
-                <p class="text-muted small mt-2 mb-0">
-                    Semua persyaratan sudah terpenuhi.
-                    Tunggu jadwal wawancara dari panitia.
-                </p>
             @elseif($pendaftaran->status_pembayaran === 'menunggu_verifikasi')
                 <span class="badge text-bg-warning fs-6 px-4 py-2">
                     ✅ Berkas Valid — ⏳ Menunggu Verifikasi Pembayaran
                 </span>
-                <p class="text-muted small mt-2 mb-0">
-                    Berkas kamu sudah valid. Panitia sedang
-                    memverifikasi bukti pembayaran kamu.
-                </p>
             @else
                 <span class="badge text-bg-warning fs-6 px-4 py-2">
                     ✅ Berkas Valid — ⚠️ Bukti Pembayaran Belum Diunggah
                 </span>
-                <p class="text-muted small mt-2 mb-0">
-                    Berkas kamu sudah valid. Silakan upload
-                    bukti pembayaran untuk melanjutkan proses.
-                </p>
-                <a href="{{ route('pendaftaran.step3') }}"
-                    class="btn btn-warning btn-sm mt-2">
-                    <i class="bi bi-upload me-1"></i>
-                    Upload Bukti Pembayaran
+                <br>
+                <a href="{{ route('pendaftaran.step3') }}" class="btn btn-warning btn-sm mt-2">
+                    <i class="bi bi-upload me-1"></i> Upload Bukti Pembayaran
                 </a>
             @endif
-
         @elseif($pendaftaran->status_verifikasi === 'revisi')
             <span class="badge text-bg-warning fs-6 px-4 py-2">
                 ⚠️ Berkas Perlu Diperbaiki
             </span>
             @if($pendaftaran->catatan)
                 <div class="alert alert-warning mt-3 text-start">
-                    <strong>📝 Catatan Panitia:</strong><br>
-                    {{ $pendaftaran->catatan }}
+                    <strong>📝 Catatan Panitia:</strong><br>{{ $pendaftaran->catatan }}
                 </div>
             @endif
             <a href="{{ route('pendaftaran.step3') }}" class="btn btn-warning mt-2">
                 <i class="bi bi-upload me-1"></i>Upload Ulang Dokumen
             </a>
-        @elseif($pendaftaran->status_verifikasi === 'ditolak')
-            <span class="badge text-bg-danger fs-6 px-4 py-2">
-                ❌ Maaf, Tidak Memenuhi Syarat
-            </span>
-            <p class="text-muted small mt-2 mb-0">
-                Pendaftaran kamu tidak dapat dilanjutkan.
-                Silakan hubungi panitia untuk informasi lebih lanjut.
-            </p>
         @endif
-</div>
-</div>
+        </div>
+    </div>
+
+    {{-- ================================================
+         RINCIAN EVALUASI & CATATAN PENGUJI (WAWANCARA ULANG)
+    ================================================ --}}
+    @if($pendaftaran->status_akhir === 'wawancara_ulang' && $pendaftaran->penilaianTes->count() > 0)
+    <div class="col-12">
+        <div class="panel p-4 border-warning bg-warning bg-opacity-10">
+            <h5 class="fw-bold mb-2 text-warning-emphasis">
+                <i class="bi bi-journal-text me-2"></i>Catatan & Evaluasi Tes Sebelumnya
+            </h5>
+            <p class="text-muted small mb-3">
+                Berikut adalah rincian nilai dan catatan spesifik dari penguji agar kamu tahu aspek mana yang perlu ditingkatkan pada wawancara ulang:
+            </p>
+
+            <div class="table-responsive bg-white rounded-3 shadow-sm p-2">
+                <table class="table table-sm table-borderless mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="py-2">Kriteria Penilaian</th>
+                            <th class="py-2 text-center">Hasil</th>
+                            <th class="py-2">Catatan Penguji</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pendaftaran->penilaianTes as $penilaian)
+                        <tr>
+                            <td class="fw-semibold small text-dark">{{ $penilaian->kriteria->nama_kriteria ?? 'Kriteria' }}</td>
+                            <td class="text-center">
+                                <span class="badge 
+                                    @if($penilaian->nilai_label == 'Sangat Baik' || $penilaian->nilai_label == 'Baik') text-bg-success
+                                    @elseif($penilaian->nilai_label == 'Cukup') text-bg-warning
+                                    @else text-bg-danger @endif">
+                                    {{ $penilaian->nilai_label }}
+                                </span>
+                            </td>
+                            <td class="small text-muted">{{ $penilaian->catatan ?? 'Tidak ada catatan khusus.' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- ================================================
          DATA PENDAFTARAN
     ================================================ --}}
@@ -162,12 +185,9 @@
          JADWAL & HASIL
     ================================================ --}}
     <div class="col-12 col-md-6">
-
-        {{-- Jadwal Wawancara --}}
         <div class="panel p-4 mb-3">
             <h5 class="fw-bold mb-3">
-                <i class="bi bi-calendar-check me-2 text-primary"></i>
-                Jadwal Tes 
+                <i class="bi bi-calendar-check me-2 text-primary"></i>Jadwal Tes
             </h5>
             @if($pendaftaran->jadwal)
                 <div class="text-muted small">
@@ -179,96 +199,50 @@
                     </div>
                     <div class="d-flex justify-content-between py-2 border-bottom">
                         <span>Jam</span>
-                        <span class="fw-semibold text-dark">
-                            {{ $pendaftaran->jadwal->jam_tes }}
-                        </span>
+                        <span class="fw-semibold text-dark">{{ $pendaftaran->jadwal->jam_tes }}</span>
                     </div>
                     <div class="pt-3">
-                        <a href="{{ $pendaftaran->jadwal->link_tes }}"
-                            target="_blank"
-                            class="btn btn-success btn-sm w-100">
-                            <i class="bi bi-camera-video me-1"></i>
-                            Buka Link Tes
+                        <a href="{{ $pendaftaran->jadwal->link_tes }}" target="_blank" class="btn btn-success btn-sm w-100">
+                            <i class="bi bi-camera-video me-1"></i> Buka Link Tes
                         </a>
                     </div>
                 </div>
             @else
-                <p class="text-muted small mb-0">
-                    Belum ada jadwal tes wawancara.
-                    Silakan tunggu informasi dari panitia.
-                </p>
+                <p class="text-muted small mb-0">Belum ada jadwal tes wawancara. Silakan tunggu informasi dari panitia.</p>
             @endif
         </div>
-
-        {{-- Hasil Wawancara --}}
-        @if($pendaftaran->hasilTes)
-            <div class="panel p-4">
-                <h5 class="fw-bold mb-3">
-                    <i class="bi bi-clipboard-check me-2 text-primary"></i>
-                    Hasil Tes Wawancara
-                </h5>
-                <span class="badge fs-6 {{ $pendaftaran->hasilTes->hasil === 'lulus' ? 'text-bg-success' : 'text-bg-danger' }}">
-                    {{ $pendaftaran->hasilTes->hasil === 'lulus' ? 'Lulus' : 'Tidak Lulus' }}
-                </span>
-                @if($pendaftaran->hasilTes->keterangan)
-                    <p class="text-muted small mt-2 mb-0">
-                        {{ $pendaftaran->hasilTes->keterangan }}
-                    </p>
-                @endif
-            </div>
-        @endif
-
-        {{-- Catatan Panitia --}}
-        {{-- Hanya tampil kalau bukan status revisi
-             (revisi sudah ditampilkan di atas) --}}
-        @if($pendaftaran->catatan && $pendaftaran->status_verifikasi !== 'revisi')
-            <div class="panel p-4 mt-3">
-                <h5 class="fw-bold mb-2">
-                    <i class="bi bi-chat-left-text me-2 text-warning"></i>
-                    Catatan Panitia
-                </h5>
-                <p class="text-muted small mb-0">{{ $pendaftaran->catatan }}</p>
-            </div>
-        @endif
-
     </div>
 
     {{-- ================================================
-         INFO DAFTAR ULANG
-         Hanya tampil kalau hasil wawancara LULUS
-         Tidak bergantung pada status_verifikasi
+         INFO DAFTAR ULANG (Bersumber dari Model Informasi)
     ================================================ --}}
-   {{-- Info Daftar Ulang —
-     Bergantung pada status_akhir, BUKAN status_verifikasi --}}
-@if($pendaftaran->status_akhir === 'diterima' && $infoDaftarUlang->count() > 0)
+    @if($pendaftaran->status_akhir === 'diterima' && isset($infoDaftarUlang) && $infoDaftarUlang->count() > 0)
     <div class="col-12">
         <div class="panel p-4" style="border-left: 4px solid #16794d;">
             <h5 class="fw-bold mb-3 text-success">
-                <i class="bi bi-megaphone-fill me-2"></i>
-                Informasi Daftar Ulang
+                <i class="bi bi-megaphone-fill me-2"></i> Informasi & Panduan Daftar Ulang
             </h5>
             <p class="text-muted small mb-3">
-                Selamat! Kamu dinyatakan diterima.
-                Berikut informasi untuk daftar ulang:
+                Selamat! Kamu dinyatakan diterima. Silakan ikuti tahapan daftar ulang di bawah ini:
             </p>
             <ul class="list-unstyled mb-0">
                 @foreach($infoDaftarUlang as $info)
                     <li class="mb-3 pb-3 border-bottom">
-                        <p class="fw-semibold mb-1">
+                        <p class="fw-semibold mb-1 text-dark">
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
                             {{ $info->judul }}
                         </p>
-                        @if($info->konten && $info->konten !== $info->judul)
-                            <p class="text-muted small mb-0 ms-4">
-                                {{ $info->konten }}
-                            </p>
+                        @if($info->konten)
+                            <div class="text-muted small mb-0 ms-4">
+                                {!! nl2br(e($info->konten)) !!}
+                            </div>
                         @endif
                     </li>
                 @endforeach
             </ul>
         </div>
     </div>
-@endif
+    @endif
 
 </div>
 
@@ -276,9 +250,7 @@
     <div class="panel p-4 text-center mt-3">
         <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
         <h5>Kamu belum mendaftar</h5>
-        <p class="text-muted mb-4">
-            Silakan mulai pendaftaran terlebih dahulu.
-        </p>
+        <p class="text-muted mb-4">Silakan mulai pendaftaran terlebih dahulu.</p>
         <a href="{{ route('pendaftaran.step1') }}" class="btn btn-primary">
             <i class="bi bi-pencil-square me-1"></i>Daftar Sekarang
         </a>

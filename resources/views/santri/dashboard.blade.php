@@ -120,6 +120,13 @@
                         <span class="badge text-bg-danger fs-6 px-4 py-2">
                             😔 Maaf, Belum Diterima
                         </span>
+                    @elseif($pendaftaran->status_akhir === 'wawancara_ulang')
+                    <span class="badge text-bg-warning fs-6 px-4 py-2">
+                        🔄 Dijadwalkan Wawancara Ulang
+                    </span>
+                    <p class="text-muted small mt-2 mb-0">
+                        Nilai tes sebelumnya belum memenuhi syarat. Panitia telah memberikan kesempatan wawancara ulang. Silakan cek detail status pendaftaran terbaru.
+                    </p>
                     @elseif($pendaftaran->status_draft === 'draft')
                         <span class="badge text-bg-warning fs-6 px-4 py-2">
                             📝 Draft — Belum Disubmit

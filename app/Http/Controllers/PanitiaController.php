@@ -60,6 +60,7 @@ $pendaftars = Pendaftaran::where('status_draft', 'submit')
                             match ($status) {
                                 'pending'   => $query->where('status_verifikasi', 'pending'),
                                 'diterima'  => $query->where('status_akhir', 'diterima'),
+                                'wawancara_ulang' => $query->where('status_akhir', 'wawancara_ulang'),
                                 'ditolak'   => $query->where(function ($q) {
                                                   $q->where('status_verifikasi', 'ditolak')
                                                     ->orWhere('status_akhir', 'ditolak');
@@ -142,7 +143,7 @@ return view('panitia.pendaftar', compact('pendaftars', 'status'));
         $filter  = $request->query('filter', 'all');
         $tanggal = $request->query('tanggal');
 
-        if (!in_array($filter, ['all', 'belum', 'dijadwalkan'])) {
+        if (!in_array($filter, ['all', 'belum', 'dijadwalkan', 'wawancara_ulang'])) {
             $filter = 'all';
         }
 
@@ -155,12 +156,15 @@ return view('panitia.pendaftar', compact('pendaftars', 'status'));
 
         $counts = [
             'all'         => $pendaftars->count(),
-            'belum'       => $pendaftars->filter(fn($p) => !$p->jadwal)->count(),
+            'belum'           => $pendaftars->filter(fn($p) => !$p->jadwal && $p->status_akhir !== 'wawancara_ulang')->count(),
+            'wawancara_ulang' => $pendaftars->filter(fn($p) => $p->status_akhir === 'wawancara_ulang')->count(),
             'dijadwalkan' => $pendaftars->filter(fn($p) => $p->jadwal)->count(),
         ];
 
         if ($filter === 'belum') {
-            $pendaftars = $pendaftars->filter(fn($p) => !$p->jadwal);
+            $pendaftars = $pendaftars->filter(fn($p) => !$p->jadwal && $p->status_akhir !== 'wawancara_ulang');
+        } elseif ($filter === 'wawancara_ulang') {
+            $pendaftars = $pendaftars->filter(fn($p) => $p->status_akhir === 'wawancara_ulang');
         } elseif ($filter === 'dijadwalkan') {
             $pendaftars = $pendaftars->filter(fn($p) => $p->jadwal);
         }
@@ -225,6 +229,7 @@ return view('panitia.pendaftar', compact('pendaftars', 'status'));
                 'tanggal_tes' => $request->tanggal_tes,
                 'jam_tes'     => $request->jam_tes,
                 'link_tes'    => $request->link_tes,
+                'sudah_dilaksanakan' => false,
             ]
         );
 
@@ -346,6 +351,7 @@ return view('panitia.pendaftar', compact('pendaftars', 'status'));
             'penilaian.*.nilai'     => 'required|in:Sangat Baik,Baik,Cukup,Kurang,Sangat Kurang',
             'penilaian.*.catatan'   => 'nullable|string',
             'keterangan_umum'       => 'nullable|string',
+            'bisa_wawancara_ulang'  => 'nullable|boolean',
         ]);
 
         $pendaftaran = Pendaftaran::with('user')->findOrFail($id);
@@ -382,19 +388,31 @@ return view('panitia.pendaftar', compact('pendaftars', 'status'));
         $nilaiAkhir = round($nilaiAkhir, 2);
         $keputusan  = $nilaiAkhir >= 75 ? 'lulus' : 'tidak lulus';
 
-        // Simpan ke HasilTes
+        // Cek apakah peserta tidak lulus diberi kesempatan wawancara ulang
+        $bisaWawancaraUlang = $request->has('bisa_wawancara_ulang') ? true : false;
+        
+        // Tentukan status akhir pendaftaran
+        if ($keputusan === 'lulus') {
+            $statusAkhir = 'diterima';
+        } else {
+            // Jika tidak lulus, tentukan apakah masuk status wawancara ulang atau ditolak
+            $statusAkhir = $bisaWawancaraUlang ? 'wawancara_ulang' : 'ditolak';
+        }
+
+        // Simpan ke HasilTes (pastikan kolom di database sudah mendukung)
         $hasilTes = \App\Models\HasilTes::updateOrCreate(
             ['pendaftaran_id' => $id],
             [
-                'hasil'       => $keputusan,
-                'nilai_akhir' => $nilaiAkhir,
-                'keterangan'  => $request->keterangan_umum,
+                'hasil'                => $keputusan,
+                'nilai_akhir'          => $nilaiAkhir,
+                'keterangan'           => $request->keterangan_umum,
+                'bisa_wawancara_ulang' => $bisaWawancaraUlang,
             ]
         );
 
-        // Update status akhir
+        // Update status akhir pendaftaran
         $pendaftaran->update([
-            'status_akhir' => $keputusan === 'lulus' ? 'diterima' : 'ditolak',
+            'status_akhir' => $statusAkhir,
         ]);
 
         // Kirim email
@@ -403,6 +421,10 @@ return view('panitia.pendaftar', compact('pendaftars', 'status'));
                 ->send(new HasilCreated($pendaftaran, $hasilTes));
         } catch (\Exception $e) {}
 
+        if ($bisaWawancaraUlang) {
+            $pendaftaran->jadwal()->delete();
+            $hasilTes->delete(); 
+        }
         return redirect()->route('panitia.kelola.hasil')
                         ->with('success', "Penilaian berhasil disimpan! Nilai akhir: {$nilaiAkhir} — " . ucfirst($keputusan));
     }

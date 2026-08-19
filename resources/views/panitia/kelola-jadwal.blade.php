@@ -50,6 +50,7 @@
                 <strong>
                     @if($filter === 'all') Semua (@endif
                     @if($filter === 'belum') Belum Dijadwalkan (@endif
+                    @if($filter === 'wawancara_ulang') Wawancara Ulang (@endif
                     @if($filter === 'dijadwalkan') Sudah Dijadwalkan (@endif
                     {{ $counts[$filter] }})
                 </strong>
@@ -70,6 +71,15 @@
                         <span class="badge text-bg-warning ms-3">{{ $counts['belum'] }}</span>
                     </a>
                 </li>
+                {{-- 👇 TAMBAHAN MENU DROPDOWN FILTER WAWANCARA ULANG 👇 --}}
+                <li>
+                    <a class="dropdown-item d-flex justify-content-between align-items-center {{ $filter === 'wawancara_ulang' ? 'active' : '' }}" 
+                       href="{{ route('panitia.kelola.jadwal', ['filter' => 'wawancara_ulang']) }}">
+                        <span>Wawancara Ulang</span>
+                        <span class="badge text-bg-info ms-3">{{ $counts['wawancara_ulang'] }}</span>
+                    </a>
+                </li>
+                {{-- ------------------------------------------------ --}}
                 <li>
                     <a class="dropdown-item d-flex justify-content-between align-items-center {{ $filter === 'dijadwalkan' ? 'active' : '' }}" 
                        href="{{ route('panitia.kelola.jadwal', ['filter' => 'dijadwalkan']) }}">
@@ -106,6 +116,12 @@
                         @if($p->jadwal && !$p->jadwal->sudah_dilaksanakan && \Carbon\Carbon::parse($p->jadwal->tanggal_tes)->isToday())
                             <span class="badge text-bg-warning ms-1">Hari Ini</span>
                         @endif
+
+                        {{-- 👇 TAMBAHAN BADGE PENANDA WAWANCARA ULANG 👇 --}}
+                        @if($p->status_akhir === 'wawancara_ulang')
+                            <span class="badge text-bg-info ms-1">🔄 Wawancara Ulang</span>
+                        @endif
+                        {{-- ----------------------------------------- --}}
                     </p>
                 </td>
                 <td>{{ $p->asal_sekolah }}</td>
