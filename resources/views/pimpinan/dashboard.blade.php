@@ -28,44 +28,52 @@
 {{-- Metric Cards --}}
 <section class="row g-3 mt-1">
     <div class="col-12 col-sm-6 col-xl-3">
-        <article class="metric-card metric-primary">
-            <div class="metric-top">
-                <span class="metric-label">Total Pendaftar</span>
-                <span class="metric-icon"><i class="bi bi-people"></i></span>
-            </div>
-            <div class="metric-value">{{ $stats['total'] }}</div>
-            <div class="metric-meta"><span>Semua periode</span></div>
-        </article>
+        <a href="{{ route('pimpinan.laporan') }}" class="text-decoration-none text-reset">
+            <article class="metric-card metric-primary">
+                <div class="metric-top">
+                    <span class="metric-label">Total Pendaftar</span>
+                    <span class="metric-icon"><i class="bi bi-people"></i></span>
+                </div>
+                <div class="metric-value">{{ $stats['total'] }}</div>
+                <div class="metric-meta"><span>Semua periode</span></div>
+            </article>
+        </a>
     </div>
     <div class="col-12 col-sm-6 col-xl-3">
-        <article class="metric-card metric-warning">
-            <div class="metric-top">
-                <span class="metric-label">Menunggu Verifikasi</span>
-                <span class="metric-icon"><i class="bi bi-hourglass-split"></i></span>
-            </div>
-            <div class="metric-value">{{ $stats['pending'] }}</div>
-            <div class="metric-meta"><span>Perlu diproses panitia</span></div>
-        </article>
+        <a href="{{ route('pimpinan.laporan', ['status' => 'pending']) }}" class="text-decoration-none text-reset">
+            <article class="metric-card metric-warning">
+                <div class="metric-top">
+                    <span class="metric-label">Menunggu Verifikasi</span>
+                    <span class="metric-icon"><i class="bi bi-hourglass-split"></i></span>
+                </div>
+                <div class="metric-value">{{ $stats['pending'] }}</div>
+                <div class="metric-meta"><span>Perlu diproses panitia</span></div>
+            </article>
+        </a>
     </div>
     <div class="col-12 col-sm-6 col-xl-3">
-        <article class="metric-card metric-success">
-            <div class="metric-top">
-                <span class="metric-label">Diterima</span>
-                <span class="metric-icon"><i class="bi bi-check-circle"></i></span>
-            </div>
-            <div class="metric-value">{{ $stats['diterima'] }}</div>
-            <div class="metric-meta"><span>Lulus seleksi wawancara</span></div>
-        </article>
+        <a href="{{ route('pimpinan.laporan', ['status' => 'diterima']) }}" class="text-decoration-none text-reset">
+            <article class="metric-card metric-success">
+                <div class="metric-top">
+                    <span class="metric-label">Diterima</span>
+                    <span class="metric-icon"><i class="bi bi-check-circle"></i></span>
+                </div>
+                <div class="metric-value">{{ $stats['diterima'] }}</div>
+                <div class="metric-meta"><span>Lulus seleksi wawancara</span></div>
+            </article>
+        </a>
     </div>
     <div class="col-12 col-sm-6 col-xl-3">
-        <article class="metric-card metric-danger">
-            <div class="metric-top">
-                <span class="metric-label">Ditolak</span>
-                <span class="metric-icon"><i class="bi bi-x-circle"></i></span>
-            </div>
-            <div class="metric-value">{{ $stats['ditolak'] }}</div>
-            <div class="metric-meta"><span>Tidak lulus seleksi</span></div>
-        </article>
+        <a href="{{ route('pimpinan.laporan', ['status' => 'ditolak']) }}" class="text-decoration-none text-reset">
+            <article class="metric-card metric-danger">
+                <div class="metric-top">
+                    <span class="metric-label">Ditolak</span>
+                    <span class="metric-icon"><i class="bi bi-x-circle"></i></span>
+                </div>
+                <div class="metric-value">{{ $stats['ditolak'] }}</div>
+                <div class="metric-meta"><span>Tidak lulus seleksi</span></div>
+            </article>
+        </a>
     </div>
 </section>
 
